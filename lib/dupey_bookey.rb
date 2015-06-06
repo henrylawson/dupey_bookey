@@ -17,9 +17,7 @@ class DupeyBookey
   def group(books)
     titles = {}
     books.each do |book|
-      book_title = book['title']
-      next if book_title.blank?
-
+      next if (book_title = book['title']).blank?
       title = find_similar(book_title, titles.keys)
       (titles[title] ||= []) << book_title
     end
