@@ -9,8 +9,7 @@ class DupeyBookey
   end
 
   def dupes(data)
-    books = JSON.parse(data)
-    group(books)
+    group(JSON.parse(data))
   end
 
   private
@@ -18,31 +17,24 @@ class DupeyBookey
   def group(books)
     titles = {}
     books.each do |book|
-      original_title = book['title']
-      next if original_title.blank?
+      book_title = book['title']
+      next if book_title.blank?
 
-      title = determine_title(original_title, titles.keys)
-      titles[title] ||= []
-      titles[title] << original_title
+      title = find_similar(book_title, titles.keys)
+      (titles[title] ||= []) << book_title
     end
-    titles.select { |title, matched_titles| matched_titles.count > 1 }
+    titles.select { |_t, matches| matches.count > 1 }
   end
 
-  def determine_title(original_title, all_titles)
+  def find_similar(original_title, all_titles)
     possible_title = original_title.downcase
-    if existing_title = fuzzy_match(possible_title, all_titles)
-      existing_title
-    else
-      possible_title
+    all_titles.each do |title|
+      return title if similar?(possible_title, title)
     end
+    possible_title
   end
 
-  def fuzzy_match(possible_title, all_titles)
-    all_titles.each do |title|
-      if @jarow.getDistance(possible_title, title) >= 0.8
-        return title
-      end
-    end
-    nil
+  def similar?(string_a, string_b)
+    @jarow.getDistance(string_a, string_b) >= 0.8
   end
 end
