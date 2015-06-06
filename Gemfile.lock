@@ -16,6 +16,7 @@ GEM
     i18n (0.7.0)
     json (1.8.2)
     minitest (5.6.1)
+    rake (10.4.2)
     rspec (3.2.0)
       rspec-core (~> 3.2.0)
       rspec-expectations (~> 3.2.0)
@@ -40,4 +41,8 @@ DEPENDENCIES
   activesupport
   fuzzy-string-match
   json
+  rake
   rspec
+
+BUNDLED WITH
+   1.10.3

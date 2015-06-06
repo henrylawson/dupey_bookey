@@ -10,42 +10,35 @@ class DupeyBookey
 
   def dupes(data)
     books = JSON.parse(data)
-    title_counts = group_by_title_count(books)
-    counts_greater_than_one(title_counts)
+    group(books)
   end
 
   private
 
-  def counts_greater_than_one(title_counts)
-    titles = title_counts.map do |title, count|
-      if title.present? && count > 1
-        title.titleize
-      end
-    end
-    titles.compact
-  end
-
-  def group_by_title_count(books)
-    title_count = {}
+  def group(books)
+    titles = {}
     books.each do |book|
-      title = determine_title(book, title_count.keys)
-      title_count[title] ||= 0
-      title_count[title] = title_count[title] += 1
+      original_title = book['title']
+      next if original_title.blank?
+
+      title = determine_title(original_title, titles.keys)
+      titles[title] ||= []
+      titles[title] << original_title
     end
-    title_count
+    titles.select { |title, matched_titles| matched_titles.count > 1 }
   end
 
-  def determine_title(book, titles)
-    possible_title = book['title'].try(:downcase)
-    if existing_title = fuzzy_match(possible_title, titles)
+  def determine_title(original_title, all_titles)
+    possible_title = original_title.downcase
+    if existing_title = fuzzy_match(possible_title, all_titles)
       existing_title
     else
       possible_title
     end
   end
 
-  def fuzzy_match(possible_title, titles)
-    titles.each do |title|
+  def fuzzy_match(possible_title, all_titles)
+    all_titles.each do |title|
       if @jarow.getDistance(possible_title, title) >= 0.8
         return title
       end
