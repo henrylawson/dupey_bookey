@@ -9,19 +9,15 @@ class DupeyBookey
   end
 
   def dupes(data)
-    group(JSON.parse(data))
-  end
-
-  private
-
-  def group(books)
     matches = {}
-    books.each do |book|
+    JSON.parse(data).each do |book|
       next if (book_title = book['title']).blank?
       value_using_fuzzy_key(book_title, matches) << book_title
     end
     filter_single_matches(matches)
   end
+
+  private
 
   def value_using_fuzzy_key(book_title, titles)
     title = @fuzzy.find_similar(book_title, titles.keys)
